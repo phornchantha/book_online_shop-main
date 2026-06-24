@@ -3,10 +3,10 @@ import Navbar from "@/components/Navbar";
 import Link from "next/link";
 
 const categories = [
-  { label: "Programming", href: "/books?category=programming" },
-  { label: "Design", href: "/books?category=design" },
-  { label: "Business", href: "/books?category=business" },
   { label: "Fiction", href: "/books?category=fiction" },
+  { label: "Sci-Fi", href: "/books?category=sci-fi" },
+  { label: "Mystery", href: "/books?category=mystery" },
+  { label: "Business", href: "/books?category=business" },
 ];
 
 const featuredBooks = [

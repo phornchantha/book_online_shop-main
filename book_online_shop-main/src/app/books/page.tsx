@@ -77,7 +77,7 @@ export default function BooksPage() {
             filteredBooks.map((book) => {
               const imageUrl =
                 book.imageUrl ||
-                `https://via.placeholder.com/300x400?text=${encodeURIComponent(
+                `https://via.placeholder.com/300x400/1E293B/FFFFFF?text=${encodeURIComponent(
                   book.title,
                 )}`;
 
@@ -91,12 +91,6 @@ export default function BooksPage() {
                       src={imageUrl}
                       alt={book.title}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const img = e.target as HTMLImageElement;
-                        img.src = `https://via.placeholder.com/300x400?text=${encodeURIComponent(
-                          book.title,
-                        )}`;
-                      }}
                     />
                   </div>
                   <div className="p-6">

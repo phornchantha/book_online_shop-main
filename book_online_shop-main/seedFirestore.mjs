@@ -1,5 +1,13 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  collection,
+  getDocs,
+  deleteDoc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA9gYwnF0ajFnXAjfJGsxb59dI2vXyVGUQ",
@@ -13,6 +21,14 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+async function clearCollection(collectionName) {
+  const snapshot = await getDocs(collection(db, collectionName));
+  const deletePromises = snapshot.docs.map((docSnap) =>
+    deleteDoc(doc(db, collectionName, docSnap.id)),
+  );
+  await Promise.all(deletePromises);
+}
 
 const users = [
   {
@@ -37,123 +53,199 @@ const users = [
 
 const categories = [
   {
-    id: "programming",
-    name: "Programming",
-    description: "Programming books for developers",
+    id: "fiction",
+    name: "Fiction",
+    description: "Imaginative stories and contemporary novels.",
   },
-  { id: "design", name: "Design", description: "Design and UX books" },
+  {
+    id: "history",
+    name: "History",
+    description: "Narratives about the past and world events.",
+  },
+  {
+    id: "sci-fi",
+    name: "Sci-Fi",
+    description: "Science fiction, space adventures, and future worlds.",
+  },
+  {
+    id: "classics",
+    name: "Classics",
+    description: "Timeless literature from past generations.",
+  },
+  {
+    id: "self-help",
+    name: "Self-Help",
+    description: "Books for personal growth and productivity.",
+  },
+  {
+    id: "dystopia",
+    name: "Dystopia",
+    description: "Dark, speculative worlds and cautionary tales.",
+  },
+  {
+    id: "memoir",
+    name: "Memoir",
+    description: "Personal stories and life-changing journeys.",
+  },
+  {
+    id: "mystery",
+    name: "Mystery",
+    description: "Detective stories, thrillers, and suspense.",
+  },
+  {
+    id: "romance",
+    name: "Romance",
+    description: "Love stories and emotional journeys.",
+  },
   {
     id: "business",
     name: "Business",
-    description: "Business and entrepreneurship books",
-  },
-  {
-    id: "fiction",
-    name: "Fiction",
-    description: "Popular fiction and stories",
+    description: "Leadership, strategy, and entrepreneurship.",
   },
 ];
 
-const adjectives = [
-  "The Silent",
-  "The Hidden",
-  "The Golden",
-  "The Secret",
-  "The Lonely",
-  "The Lost",
-  "The Endless",
-  "The Forgotten",
-  "The Burning",
-  "The Midnight",
-];
-
-const subjects = [
-  "Garden",
-  "Promise",
-  "Mirror",
-  "River",
-  "Empire",
-  "Shadow",
-  "Voyage",
-  "Memory",
-  "Song",
-  "City",
-  "Path",
-  "Legacy",
-  "Dream",
-  "Sky",
-  "Light",
-  "Storm",
-  "Heart",
-  "Bridge",
-  "Forest",
-  "Truth",
-];
-
-const authors = [
-  "Ava Collins",
-  "M. Johnson",
-  "Noah Bennett",
-  "Grace Kim",
-  "Elliot Parker",
-  "Lina Foster",
-  "Kai Morgan",
-  "Sofia Reed",
-  "Luca Hayes",
-  "Maya Brooks",
-  "Jules Carter",
-  "Nina Taylor",
-  "Owen Price",
-  "Zara White",
-  "Ethan Brooks",
-  "Mia Lewis",
-  "Adrian Cole",
-  "Ruby Green",
-  "Leo Foster",
-  "Maya Chen",
-];
-
-const categoryMap = {
-  Garden: "fiction",
-  Promise: "fiction",
-  Mirror: "fiction",
-  River: "fiction",
-  Empire: "fiction",
-  Shadow: "fiction",
-  Voyage: "fiction",
-  Memory: "fiction",
-  Song: "fiction",
-  City: "fiction",
-  Path: "fiction",
-  Legacy: "business",
-  Dream: "design",
-  Sky: "business",
-  Light: "design",
-  Storm: "fiction",
-  Heart: "fiction",
-  Bridge: "business",
-  Forest: "fiction",
-  Truth: "business",
+const categoryBooks = {
+  fiction: [
+    { title: "The Night Circus", author: "Erin Morgenstern" },
+    { title: "The Goldfinch", author: "Donna Tartt" },
+    { title: "The Shadow of the Wind", author: "Carlos Ruiz Zafón" },
+    { title: "The Kite Runner", author: "Khaled Hosseini" },
+    { title: "The Book Thief", author: "Markus Zusak" },
+    { title: "Life of Pi", author: "Yann Martel" },
+    { title: "A Little Life", author: "Hanya Yanagihara" },
+    { title: "The Nightingale", author: "Kristin Hannah" },
+    { title: "Eleanor Oliphant Is Completely Fine", author: "Gail Honeyman" },
+    { title: "The Secret History", author: "Donna Tartt" },
+  ],
+  history: [
+    { title: "Sapiens", author: "Yuval Noah Harari" },
+    { title: "The Silk Roads", author: "Peter Frankopan" },
+    { title: "The Wright Brothers", author: "David McCullough" },
+    { title: "Team of Rivals", author: "Doris Kearns Goodwin" },
+    { title: "The Splendid and the Vile", author: "Erik Larson" },
+    { title: "Guns, Germs, and Steel", author: "Jared Diamond" },
+    { title: "1776", author: "David McCullough" },
+    { title: "The Devil in the White City", author: "Erik Larson" },
+    { title: "A People's History of the United States", author: "Howard Zinn" },
+    { title: "Alexander Hamilton", author: "Ron Chernow" },
+  ],
+  "sci-fi": [
+    { title: "Dune", author: "Frank Herbert" },
+    { title: "Neuromancer", author: "William Gibson" },
+    { title: "Foundation", author: "Isaac Asimov" },
+    { title: "Ender's Game", author: "Orson Scott Card" },
+    { title: "The Martian", author: "Andy Weir" },
+    { title: "Ready Player One", author: "Ernest Cline" },
+    { title: "Snow Crash", author: "Neal Stephenson" },
+    { title: "Brave New World", author: "Aldous Huxley" },
+    { title: "The Three-Body Problem", author: "Cixin Liu" },
+    { title: "The Left Hand of Darkness", author: "Ursula K. Le Guin" },
+  ],
+  classics: [
+    { title: "Pride and Prejudice", author: "Jane Austen" },
+    { title: "To Kill a Mockingbird", author: "Harper Lee" },
+    { title: "1984", author: "George Orwell" },
+    { title: "Jane Eyre", author: "Charlotte Brontë" },
+    { title: "Moby-Dick", author: "Herman Melville" },
+    { title: "Wuthering Heights", author: "Emily Brontë" },
+    { title: "The Great Gatsby", author: "F. Scott Fitzgerald" },
+    { title: "Crime and Punishment", author: "Fyodor Dostoevsky" },
+    { title: "Anna Karenina", author: "Leo Tolstoy" },
+    { title: "The Odyssey", author: "Homer" },
+  ],
+  "self-help": [
+    { title: "Atomic Habits", author: "James Clear" },
+    { title: "The Power of Habit", author: "Charles Duhigg" },
+    {
+      title: "How to Win Friends and Influence People",
+      author: "Dale Carnegie",
+    },
+    { title: "The Subtle Art of Not Giving a F*ck", author: "Mark Manson" },
+    { title: "You Are a Badass", author: "Jen Sincero" },
+    {
+      title: "The 7 Habits of Highly Effective People",
+      author: "Stephen R. Covey",
+    },
+    { title: "Mindset", author: "Carol S. Dweck" },
+    { title: "Grit", author: "Angela Duckworth" },
+    { title: "Start with Why", author: "Simon Sinek" },
+    { title: "Drive", author: "Daniel H. Pink" },
+  ],
+  dystopia: [
+    { title: "The Handmaid's Tale", author: "Margaret Atwood" },
+    { title: "Fahrenheit 451", author: "Ray Bradbury" },
+    { title: "The Road", author: "Cormac McCarthy" },
+    { title: "The Giver", author: "Lois Lowry" },
+    { title: "Station Eleven", author: "Emily St. John Mandel" },
+    { title: "The Maze Runner", author: "James Dashner" },
+    { title: "Never Let Me Go", author: "Kazuo Ishiguro" },
+    { title: "Divergent", author: "Veronica Roth" },
+    { title: "The Hunger Games", author: "Suzanne Collins" },
+    { title: "The Children of Men", author: "P.D. James" },
+  ],
+  memoir: [
+    { title: "Educated", author: "Tara Westover" },
+    { title: "Becoming", author: "Michelle Obama" },
+    { title: "The Glass Castle", author: "Jeannette Walls" },
+    { title: "When Breath Becomes Air", author: "Paul Kalanithi" },
+    { title: "Born a Crime", author: "Trevor Noah" },
+    { title: "Wild", author: "Cheryl Strayed" },
+    { title: "The Diary of a Young Girl", author: "Anne Frank" },
+    { title: "I Know Why the Caged Bird Sings", author: "Maya Angelou" },
+    { title: "Into the Wild", author: "Jon Krakauer" },
+    { title: "Hillbilly Elegy", author: "J.D. Vance" },
+  ],
+  mystery: [
+    { title: "Gone Girl", author: "Gillian Flynn" },
+    { title: "The Girl on the Train", author: "Paula Hawkins" },
+    { title: "The Da Vinci Code", author: "Dan Brown" },
+    { title: "In the Woods", author: "Tana French" },
+    { title: "The Silent Patient", author: "Alex Michaelides" },
+    { title: "The Woman in the Window", author: "A.J. Finn" },
+    { title: "Sharp Objects", author: "Gillian Flynn" },
+    { title: "The Cuckoo's Calling", author: "Robert Galbraith" },
+    { title: "Big Little Lies", author: "Liane Moriarty" },
+    { title: "Mystic River", author: "Dennis Lehane" },
+  ],
+  romance: [
+    { title: "The Notebook", author: "Nicholas Sparks" },
+    { title: "Me Before You", author: "Jojo Moyes" },
+    { title: "Outlander", author: "Diana Gabaldon" },
+    { title: "Pride and Prejudice", author: "Jane Austen" },
+    { title: "The Time Traveler's Wife", author: "Audrey Niffenegger" },
+    { title: "The Rosie Project", author: "Graeme Simsion" },
+    { title: "One Day", author: "David Nicholls" },
+    { title: "Beach Read", author: "Emily Henry" },
+    { title: "The Hating Game", author: "Sally Thorne" },
+    { title: "Eleanor Oliphant Is Completely Fine", author: "Gail Honeyman" },
+  ],
+  business: [
+    { title: "Zero to One", author: "Peter Thiel" },
+    { title: "The Lean Startup", author: "Eric Ries" },
+    { title: "Good to Great", author: "Jim Collins" },
+    { title: "Start with Why", author: "Simon Sinek" },
+    { title: "The 4-Hour Workweek", author: "Tim Ferriss" },
+    { title: "Thinking, Fast and Slow", author: "Daniel Kahneman" },
+    { title: "The Hard Thing About Hard Things", author: "Ben Horowitz" },
+    { title: "Drive", author: "Daniel H. Pink" },
+    { title: "The Innovator's Dilemma", author: "Clayton M. Christensen" },
+    { title: "Influence", author: "Robert B. Cialdini" },
+  ],
 };
 
-const books = Array.from({ length: 100 }, (_, index) => {
-  const adjective = adjectives[index % adjectives.length];
-  const subject = subjects[index % subjects.length];
-  const title = `${adjective} ${subject}`;
-  const bookId = `book-${index + 1}`;
-
-  return {
-    id: bookId,
-    title,
-    author: authors[index % authors.length],
-    price: Number((12.99 + (index % 12) * 1.75).toFixed(2)),
-    stock: 10 + (index % 8) * 5,
-    categoryId: categoryMap[subject],
+const books = Object.entries(categoryBooks).flatMap(([categoryId, items]) =>
+  items.map((item, index) => ({
+    id: `${categoryId}-${index + 1}`,
+    title: item.title,
+    author: item.author,
+    price: Number((12.99 + ((index + 1) % 10) * 1.75).toFixed(2)),
+    stock: 20 + ((index + 1) % 5) * 10,
+    categoryId,
     sellerId: "seller-1",
-    description: `A compelling ${subject.toLowerCase()} story with thoughtful themes and unforgettable characters.`,
-    imageUrl: `https://via.placeholder.com/300x400/1E293B/FFFFFF?text=${encodeURIComponent(title)}`,
-  };
-});
+    description: `A compelling ${categoryId} title that offers readers insightful storytelling and memorable characters.`,
+    imageUrl: `https://covers.openlibrary.org/b/title/${encodeURIComponent(item.title)}-M.jpg`,
+  })),
+);
 
 const cartItems = [
   {
@@ -230,6 +322,20 @@ const coupons = [
 
 async function seed() {
   try {
+    console.log("Clearing Firestore collections...");
+    await Promise.all([
+      clearCollection("users"),
+      clearCollection("categories"),
+      clearCollection("books"),
+      clearCollection("cart"),
+      clearCollection("orders"),
+      clearCollection("payments"),
+      clearCollection("reviews"),
+      clearCollection("wishlist"),
+      clearCollection("notifications"),
+      clearCollection("coupons"),
+    ]);
+
     console.log("Seeding Firestore collections...");
 
     for (const user of users) {
