@@ -1,13 +1,16 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { fetchCategories } from "@/lib/categories";
 
-const categories = [
-  { label: "Fiction", href: "/books?category=fiction" },
-  { label: "Sci-Fi", href: "/books?category=sci-fi" },
-  { label: "Mystery", href: "/books?category=mystery" },
-  { label: "Business", href: "/books?category=business" },
-];
+type Category = {
+  id: string;
+  name: string;
+  description: string;
+};
 
 const featuredBooks = [
   { title: "Clean Code", author: "Robert C. Martin", price: "$24.99" },
@@ -16,6 +19,23 @@ const featuredBooks = [
 ];
 
 export default function Home() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await fetchCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadCategories();
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar />
@@ -85,22 +105,28 @@ export default function Home() {
               View all
             </Link>
           </div>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((category) => (
-              <Link
-                key={category.label}
-                href={category.href}
-                className="group overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"
-              >
-                <p className="text-base font-semibold text-slate-900 group-hover:text-slate-700">
-                  {category.label}
-                </p>
-                <p className="mt-3 text-sm text-slate-500">
-                  Explore curated books in this category.
-                </p>
-              </Link>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="mt-6 text-center text-slate-600">
+              Loading categories...
+            </div>
+          ) : (
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/books?category=${category.id}`}
+                  className="group overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <p className="text-base font-semibold text-slate-900 group-hover:text-slate-700">
+                    {category.name}
+                  </p>
+                  <p className="mt-3 text-sm text-slate-500">
+                    {category.description}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
       </main>
       <Footer />

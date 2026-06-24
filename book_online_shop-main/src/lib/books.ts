@@ -26,18 +26,28 @@ export type Book = {
 
 export async function fetchBooks(category?: string) {
   const booksCollection = collection(db, "books");
-  const q = category
-    ? query(
-        booksCollection,
-        where("categoryId", "==", category),
-        orderBy("title"),
-      )
-    : query(booksCollection, orderBy("title"));
+
+  let q;
+  if (category) {
+    // For filtered queries, don't use orderBy to avoid needing a composite index
+    q = query(booksCollection, where("categoryId", "==", category));
+  } else {
+    // For all books, use orderBy
+    q = query(booksCollection, orderBy("title"));
+  }
+
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((docSnap) => ({
+  const books = snapshot.docs.map((docSnap) => ({
     id: docSnap.id,
     ...docSnap.data(),
   })) as Book[];
+
+  // Sort client-side if we have a category filter
+  if (category) {
+    books.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  return books;
 }
 
 export async function fetchBookById(bookId: string) {

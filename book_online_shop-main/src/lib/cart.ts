@@ -24,7 +24,6 @@ export async function fetchCartItems(userId: string) {
   const cartQuery = query(
     collection(db, "cart"),
     where("userId", "==", userId),
-    orderBy("title"),
   );
   const snapshot = await getDocs(cartQuery);
   return snapshot.docs.map((docSnap) => ({

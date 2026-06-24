@@ -4,17 +4,20 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Book, fetchBooks } from "@/lib/books";
+import { Category, fetchCategories } from "@/lib/categories";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "react-hot-toast";
 
 const initialBooks: Book[] = [];
+const initialCategories: Category[] = [];
 
 export default function BooksPage() {
   const searchParams = useSearchParams();
   const category = searchParams?.get("category") || "";
   const [search, setSearch] = useState("");
   const [books, setBooks] = useState<Book[]>(initialBooks);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -30,6 +33,23 @@ export default function BooksPage() {
     };
     loadBooks();
   }, [category]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await fetchCategories();
+        setCategories(cats);
+      } catch (error) {
+        console.error("Unable to load categories:", error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  const currentCategory = useMemo(
+    () => categories.find((cat) => cat.id === category),
+    [categories, category],
+  );
 
   const filteredBooks = useMemo(
     () =>
@@ -49,10 +69,27 @@ export default function BooksPage() {
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-semibold">Books</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-semibold">Books</h1>
+              {currentCategory && (
+                <span className="rounded-full bg-slate-200 px-3 py-1 text-sm font-medium text-slate-700">
+                  {currentCategory.name}
+                </span>
+              )}
+            </div>
             <p className="mt-2 text-sm text-slate-600">
-              Search by title, author, or category.
+              {currentCategory
+                ? currentCategory.description
+                : "Search by title, author, or category."}
             </p>
+            {currentCategory && (
+              <Link
+                href="/books"
+                className="mt-2 text-sm text-blue-600 hover:text-blue-700"
+              >
+                ← View all books
+              </Link>
+            )}
           </div>
           <div className="w-full max-w-sm">
             <input
@@ -63,6 +100,29 @@ export default function BooksPage() {
             />
           </div>
         </header>
+
+        {/* Categories Section */}
+        {!category && categories.length > 0 && (
+          <section className="mt-10 border-b border-slate-200 pb-10">
+            <h2 className="mb-6 text-2xl font-semibold">Browse by category</h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {categories.map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={`/books?category=${cat.id}`}
+                  className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md hover:border-slate-300"
+                >
+                  <h3 className="text-lg font-semibold text-slate-900 group-hover:text-slate-700">
+                    {cat.name}
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-600">
+                    {cat.description}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {isLoading ? (

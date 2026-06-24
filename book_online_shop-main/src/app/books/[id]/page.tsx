@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import BookImage from "@/components/BookImage";
+import BookDetailActions from "@/components/BookDetailActions";
 import { fetchBookById } from "@/lib/books";
 
 type BookDetailProps = {
@@ -25,7 +27,7 @@ export default async function BookDetailPage({ params }: BookDetailProps) {
         <div className="grid gap-10 lg:grid-cols-[1fr_0.7fr]">
           <section className="rounded-3xl border border-slate-200 bg-white overflow-hidden shadow-sm">
             <div className="relative w-full h-96 bg-slate-100">
-              <img
+              <BookImage
                 src={
                   book.imageUrl ||
                   `https://via.placeholder.com/500x600?text=${encodeURIComponent(
@@ -33,13 +35,8 @@ export default async function BookDetailPage({ params }: BookDetailProps) {
                   )}`
                 }
                 alt={book.title}
+                title={book.title}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.src = `https://via.placeholder.com/500x600?text=${encodeURIComponent(
-                    book.title,
-                  )}`;
-                }}
               />
             </div>
             <div className="p-8">
@@ -76,12 +73,7 @@ export default async function BookDetailPage({ params }: BookDetailProps) {
                 Fast checkout and secure orders.
               </p>
             </div>
-            <Link
-              href="/cart"
-              className="block rounded-full bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-700"
-            >
-              Add to cart
-            </Link>
+            <BookDetailActions book={book} />
             <Link
               href="/books"
               className="block rounded-full border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
