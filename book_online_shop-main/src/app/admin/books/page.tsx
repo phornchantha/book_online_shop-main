@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import useFirebaseAuth from "@/lib/useFirebaseAuth";
 import { toast } from "react-hot-toast";
 import { Book, fetchBooks, createBook, deleteBook } from "@/lib/books";
 import { fetchCategories } from "@/lib/categories";
@@ -12,6 +14,8 @@ import { bookFormSchema } from "@/lib/bookForm";
 import type { BookFormValues } from "@/lib/bookForm";
 
 export default function AdminBooksPage() {
+  const { userRole, isLoaded } = useFirebaseAuth();
+  const router = useRouter();
   const [books, setBooks] = useState<Book[]>([]);
   const [categories, setCategories] = useState(
     [] as { id: string; name: string }[],
@@ -36,6 +40,12 @@ export default function AdminBooksPage() {
       description: "",
     },
   });
+
+  useEffect(() => {
+    if (isLoaded && userRole !== "admin") {
+      router.push("/");
+    }
+  }, [isLoaded, userRole, router]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -84,6 +94,24 @@ export default function AdminBooksPage() {
       toast.error("Unable to delete book.");
     }
   };
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900">
+        <Navbar />
+        <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-slate-600">Loading...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (userRole !== "admin") {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">

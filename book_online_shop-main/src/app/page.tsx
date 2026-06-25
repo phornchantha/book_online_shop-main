@@ -12,12 +12,6 @@ type Category = {
   description: string;
 };
 
-const featuredBooks = [
-  { title: "Clean Code", author: "Robert C. Martin", price: "$24.99" },
-  { title: "Atomic Habits", author: "James Clear", price: "$18.99" },
-  { title: "The Pragmatic Programmer", author: "Andrew Hunt", price: "$29.99" },
-];
-
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,29 +62,6 @@ export default function Home() {
               >
                 Sign In
               </Link>
-            </div>
-          </div>
-          <div className="rounded-3xl bg-gradient-to-br from-slate-800 to-slate-950 p-8 text-white shadow-2xl sm:p-10">
-            <div className="space-y-6">
-              <div>
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-300">
-                  Bestsellers
-                </p>
-                <h2 className="mt-2 text-3xl font-semibold">
-                  Top picks this week
-                </h2>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {featuredBooks.map((book) => (
-                  <div key={book.title} className="rounded-3xl bg-white/10 p-5">
-                    <p className="text-sm text-slate-300">{book.author}</p>
-                    <h3 className="mt-3 text-xl font-semibold">{book.title}</h3>
-                    <p className="mt-4 text-lg font-semibold text-slate-100">
-                      {book.price}
-                    </p>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </section>

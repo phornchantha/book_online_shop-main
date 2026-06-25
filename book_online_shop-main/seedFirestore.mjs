@@ -38,16 +38,16 @@ const users = [
     role: "admin",
   },
   {
-    id: "seller-1",
-    name: "Seller One",
-    email: "seller1@bookshop.com",
-    role: "seller",
+    id: "user-1",
+    name: "User One",
+    email: "user1@bookshop.com",
+    role: "user",
   },
   {
-    id: "buyer-1",
-    name: "Buyer One",
-    email: "buyer1@bookshop.com",
-    role: "buyer",
+    id: "user-2",
+    name: "User Two",
+    email: "user2@bookshop.com",
+    role: "user",
   },
 ];
 

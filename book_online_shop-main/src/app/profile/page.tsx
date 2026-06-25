@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import useFirebaseAuth from "@/lib/useFirebaseAuth";
 
 export default function ProfilePage() {
-  const { user, isLoaded } = useFirebaseAuth();
+  const { user, userRole, userData, isLoaded } = useFirebaseAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function ProfilePage() {
       <Navbar />
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="rounded-3xl border border-slate-200 bg-white p-10 shadow-lg">
-          <h1 className="text-3xl font-semibold">My profile</h1>
+          <h1 className="text-3xl font-semibold">My Profile</h1>
           <p className="mt-2 text-slate-600">
             Manage your account information and preferences.
           </p>
@@ -49,7 +49,7 @@ export default function ProfilePage() {
                 Name
               </p>
               <p className="mt-4 text-xl font-semibold text-slate-900">
-                {user.displayName || "User"}
+                {userData?.name || user.displayName || "User"}
               </p>
             </div>
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
@@ -58,6 +58,31 @@ export default function ProfilePage() {
               </p>
               <p className="mt-4 text-xl font-semibold text-slate-900">
                 {user.email || "No email"}
+              </p>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+              <p className="text-sm uppercase tracking-[0.24em] text-slate-500">
+                Account Role
+              </p>
+              <p className="mt-4 text-xl font-semibold text-slate-900 capitalize">
+                {userRole ? (
+                  <>
+                    {userRole === "admin" && "👨‍💼 Admin"}
+                    {userRole === "user" && "👤 User"}
+                  </>
+                ) : (
+                  "Loading..."
+                )}
+              </p>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+              <p className="text-sm uppercase tracking-[0.24em] text-slate-500">
+                Member Since
+              </p>
+              <p className="mt-4 text-xl font-semibold text-slate-900">
+                {user.metadata?.creationTime
+                  ? new Date(user.metadata.creationTime).toLocaleDateString()
+                  : "Unknown"}
               </p>
             </div>
           </div>

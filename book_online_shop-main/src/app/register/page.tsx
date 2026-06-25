@@ -15,7 +15,6 @@ type RegisterFormValues = {
   email: string;
   password: string;
   confirmPassword: string;
-  role: "buyer" | "seller";
 };
 
 export default function RegisterPage() {
@@ -27,9 +26,6 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
-    defaultValues: {
-      role: "buyer",
-    },
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -39,7 +35,7 @@ export default function RegisterPage() {
         name: data.name,
         email: data.email,
         password: data.password,
-        role: data.role,
+        role: "user",
       });
       toast.success("Account created successfully");
       router.push("/");
@@ -118,23 +114,6 @@ export default function RegisterPage() {
               {errors.confirmPassword && (
                 <p className="mt-2 text-sm text-red-600">
                   {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700">
-                Role
-              </label>
-              <select
-                {...register("role")}
-                className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
-              >
-                <option value="buyer">Buyer</option>
-                <option value="seller">Seller</option>
-              </select>
-              {errors.role && (
-                <p className="mt-2 text-sm text-red-600">
-                  {errors.role.message}
                 </p>
               )}
             </div>

@@ -11,13 +11,13 @@ import {
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
-export type UserRole = "admin" | "seller" | "buyer";
+export type UserRole = "admin" | "user";
 
 export async function registerUser({
   name,
   email,
   password,
-  role = "buyer",
+  role = "user",
 }: {
   name: string;
   email: string;

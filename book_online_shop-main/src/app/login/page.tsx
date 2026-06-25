@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { doc, getDoc } from "firebase/firestore";
 import { loginSchema } from "@/lib/validators";
 import { loginUser } from "@/lib/auth";
+import { db } from "@/lib/firebase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "react-hot-toast";
@@ -29,9 +31,21 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       setIsLoading(true);
-      await loginUser(data);
+      const user = await loginUser(data);
+
+      // Fetch user role from Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      const userRole = userDocSnap.data()?.role || "user";
+
       toast.success("Logged in successfully");
-      router.push("/");
+
+      // Redirect based on role
+      if (userRole === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     } catch (error) {
       toast.error("Failed to login. Please check your credentials.");
     } finally {

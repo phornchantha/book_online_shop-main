@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import useFirebaseAuth from "@/lib/useFirebaseAuth";
 import { toast } from "react-hot-toast";
 import {
   Category,
@@ -22,6 +24,8 @@ const categorySchema = z.object({
 type CategoryFormValues = z.infer<typeof categorySchema>;
 
 export default function AdminCategoriesPage() {
+  const { userRole, isLoaded } = useFirebaseAuth();
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -34,6 +38,12 @@ export default function AdminCategoriesPage() {
   } = useForm<CategoryFormValues>({
     resolver: zodResolver(categorySchema),
   });
+
+  useEffect(() => {
+    if (isLoaded && userRole !== "admin") {
+      router.push("/");
+    }
+  }, [isLoaded, userRole, router]);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -75,6 +85,24 @@ export default function AdminCategoriesPage() {
       toast.error("Unable to delete category.");
     }
   };
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900">
+        <Navbar />
+        <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-slate-600">Loading...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (userRole !== "admin") {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
